@@ -22,10 +22,12 @@ model_paths = {'train': './model/icnet_cityscapes_train_30k.npy',
               'trainval': './model/icnet_cityscapes_trainval_90k.npy',
               'train_bn': './model/icnet_cityscapes_train_30k_bnnomerge.npy',
               'trainval_bn': './model/icnet_cityscapes_trainval_90k_bnnomerge.npy',
-              'others': './model/'}
+              'others': './model/',
+              'icnet': './model/icnet_model.npy'}
 
 # mapping different model
-model_config = {'train': ICNet, 'trainval': ICNet, 'train_bn': ICNet_BN, 'trainval_bn': ICNet_BN, 'others': ICNet_BN}
+model_config = {'train': ICNet, 'trainval': ICNet, 'train_bn': ICNet_BN, 
+                'trainval_bn': ICNet_BN, 'others': ICNet_BN, 'icnet': ICNet}
 
 snapshot_dir = './snapshots'
 SAVE_DIR = './output/'
@@ -37,7 +39,7 @@ def get_arguments():
                         required=True)
     parser.add_argument("--model", type=str, default='',
                         help="Model to use.",
-                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others'],
+                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others', 'icnet'],
                         required=True)
     parser.add_argument("--save-dir", type=str, default=SAVE_DIR,
                         help="Path to save output.")
@@ -160,6 +162,8 @@ def main():
     model_path = model_paths[args.model]
     if args.model == 'others':
         ckpt = tf.train.get_checkpoint_state(model_path)
+        print(ckpt)
+        print(ckpt.model_checkpoint_path)
         if ckpt and ckpt.model_checkpoint_path:
             loader = tf.train.Saver(var_list=tf.global_variables())
             load_step = int(os.path.basename(ckpt.model_checkpoint_path).split('-')[1])
