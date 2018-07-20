@@ -26,17 +26,18 @@ cityscapes_param = {'name': 'cityscapes',
                     'num_classes': 19,
                     'ignore_label': 255,
                     'num_steps': 500,
-                    'data_dir': '/data/cityscapes_dataset/cityscape', 
+                    'data_dir': '../cityscapes', 
                     'data_list': './list/cityscapes_val_list.txt'}
 
 model_paths = {'train': './model/icnet_cityscapes_train_30k.npy', 
               'trainval': './model/icnet_cityscapes_trainval_90k.npy',
               'train_bn': './model/icnet_cityscapes_train_30k_bnnomerge.npy',
               'trainval_bn': './model/icnet_cityscapes_trainval_90k_bnnomerge.npy',
-              'others': './model/'}
+              'others': './model/',
+              'icnet': './model/icnet_model.npy'}
 
 # mapping different model
-model_config = {'train': ICNet, 'trainval': ICNet, 'train_bn': ICNet_BN, 'trainval_bn': ICNet_BN, 'others': ICNet_BN}
+model_config = {'train': ICNet, 'trainval': ICNet, 'train_bn': ICNet_BN, 'trainval_bn': ICNet_BN, 'others': ICNet_BN, 'icnet': ICNet}
 
 
 def get_arguments():
@@ -46,7 +47,7 @@ def get_arguments():
                         help="whether to measure inference time")
     parser.add_argument("--model", type=str, default='',
                         help="Model to use.",
-                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others'],
+                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others', 'icnet'],
                         required=True)
     parser.add_argument("--flipped-eval", action="store_true",
                         help="whether to evaluate with flipped img.")
@@ -168,6 +169,10 @@ def main():
         print('Restore from {}'.format(model_path))
 
     img_files, anno_files = read_labeled_image_list(param['data_dir'], param['data_list'])
+
+
+
+    
     for i in trange(param['num_steps'], desc='evaluation', leave=True):
         feed_dict = {image_filename: img_files[i], anno_filename: anno_files[i]}
         _ = sess.run(update_op, feed_dict=feed_dict)

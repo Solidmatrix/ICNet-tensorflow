@@ -18,7 +18,7 @@ from image_reader import ImageReader
 IMG_MEAN = np.array((103.939, 116.779, 123.68), dtype=np.float32)
 
 # If you want to apply to other datasets, change following four lines
-DATA_DIR = '/PATH/TO/CITYSCAPES_DATASET'
+DATA_DIR = '../cityscapes'
 DATA_LIST_PATH = './list/cityscapes_train_list.txt' 
 IGNORE_LABEL = 255 # The class number of background
 INPUT_SIZE = '720, 720' # Input size for training
@@ -31,7 +31,7 @@ NUM_STEPS = 60001
 POWER = 0.9
 RANDOM_SEED = 1234
 WEIGHT_DECAY = 0.0001
-PRETRAINED_MODEL = './model/icnet_cityscapes_trainval_90k_bnnomerge.npy'
+PRETRAINED_MODEL = './icnet_model/icnet_cityscapes_trainval_90k_bnnomerge.npy'
 SNAPSHOT_DIR = './snapshots/'
 SAVE_NUM_IMAGES = 4
 SAVE_PRED_EVERY = 50
