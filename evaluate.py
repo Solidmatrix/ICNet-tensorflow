@@ -43,20 +43,20 @@ model_config = {'train': ICNet, 'trainval': ICNet, 'train_bn': ICNet_BN, 'trainv
 def get_arguments():
     parser = argparse.ArgumentParser(description="Reproduced PSPNet")
 
-    parser.add_argument("--measure-time", action="store_true",
+    parser.add_argument("--measure-time", action="store_false",
                         help="whether to measure inference time")
-    parser.add_argument("--model", type=str, default='',
+    parser.add_argument("--model", type=str, default='icnet',
                         help="Model to use.",
-                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others', 'icnet'],
-                        required=True)
+                        choices=['train', 'trainval', 'train_bn', 'trainval_bn', 'others', 'icnet'])
     parser.add_argument("--flipped-eval", action="store_true",
                         help="whether to evaluate with flipped img.")
-    parser.add_argument("--dataset", type=str, default='',
-                        choices=['ade20k', 'cityscapes'],
-                        required=True)
+    parser.add_argument("--dataset", type=str, default='cityscapes',
+                        choices=['ade20k', 'cityscapes'])
     parser.add_argument("--filter-scale", type=int, default=1,
                         help="1 for using pruned model, while 2 for using non-pruned model.",
                         choices=[1, 2])
+    parser.add_argument("--quantize", action="store_true",
+                        help="whether to use quantization")
 
     return parser.parse_args()
 
@@ -78,6 +78,7 @@ def calculate_time(sess, net, pred, feed_dict):
 
     time_list.append(inference_time)
     print('average inference time: {}'.format(np.mean(time_list)))
+    print('frame per second: {}'.format(1.0 / np.mean(time_list)))
 
 def preprocess(img, param):
     # Convert RGB to BGR
@@ -170,10 +171,15 @@ def main():
 
     img_files, anno_files = read_labeled_image_list(param['data_dir'], param['data_list'])
 
-
+    if args.quantize:
+        g = tf.get_default_graph()
+        tf.contrib.quantize.create_eval_graph(g)
+        description = "quantize_evaluation"
+    else:
+        description = "evaluation"
 
     
-    for i in trange(param['num_steps'], desc='evaluation', leave=True):
+    for i in trange(param['num_steps'], desc=description, leave=True):
         feed_dict = {image_filename: img_files[i], anno_filename: anno_files[i]}
         _ = sess.run(update_op, feed_dict=feed_dict)
 
